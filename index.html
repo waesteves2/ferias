@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Férias UND 304</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        form {
+            width: 400px;
+            margin: 20px auto;
+        }
+
+        form label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        form input[type="text"],
+        form input[type="date"],
+        form input[type="submit"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table th,
+        table td {
+            padding: 8px;
+            border: 1px solid #ccc;
+        }
+
+        table th {
+            background-color: #f2f2f2;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        table caption {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        #agendar {
+            background-color: #4CAF50;
+            cursor: pointer;
+            color: white;
+            margin-left: 10px;
+        }
+
+        table button {
+            padding: 6px 10px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 5px;
+
+        }
+
+        .excluir {
+            background-color: #ff0000;
+        }
+    </style>
+    <script>
+        window.onload = function () {
+            carregarDados();
+        };
+
+        function agendarFerias() {
+            var nome = document.getElementById("nome").value;
+            var inicio = document.getElementById("inicio").value;
+            var fim = document.getElementById("fim").value;
+
+            var table = document.getElementById("tabela-ferias");
+            var row = table.insertRow(-1);
+            var cell1 = row.insertCell(0);
+            var cell2 = row.insertCell(1);
+            var cell3 = row.insertCell(2);
+            var cell4 = row.insertCell(3);
+
+            cell1.textContent = nome;
+            cell2.textContent = formatDate(inicio);
+            cell3.textContent = formatDate(fim);
+
+            var editarButton = document.createElement("button");
+            editarButton.textContent = "Editar";
+            editarButton.addEventListener("click", function () {
+                editarFerias(this);
+            });
+            cell4.appendChild(editarButton);
+
+            var excluirButton = document.createElement("button");
+            excluirButton.textContent = "Excluir";
+            excluirButton.className = "excluir";
+            excluirButton.addEventListener("click", function () {
+                excluirFerias(this);
+            });
+            cell4.appendChild(excluirButton);
+
+            document.getElementById("nome").value = "";
+            document.getElementById("inicio").value = "";
+            document.getElementById("fim").value = "";
+
+            salvarDadosLocalmente();
+        }
+
+        function editarFerias(button) {
+            var row = button.parentNode.parentNode;
+            var nome = row.cells
+            var nome = row.cells[0].textContent;
+            var inicio = row.cells[1].textContent;
+            var fim = row.cells[2].textContent;
+
+            document.getElementById("nome").value = nome;
+            document.getElementById("inicio").value = inicio;
+            document.getElementById("fim").value = fim;
+
+            row.parentNode.removeChild(row);
+        }
+
+        function excluirFerias(button) {
+            var row = button.parentNode.parentNode;
+            row.parentNode.removeChild(row);
+
+            salvarDadosLocalmente();
+        }
+
+        function salvarDadosLocalmente() {
+            var table = document.getElementById("tabela-ferias");
+            var rows = table.rows;
+            var ferias = [];
+
+            for (var i = 1; i < rows.length; i++) {
+                var nome = rows[i].cells[0].textContent;
+                var inicio = rows[i].cells[1].textContent;
+                var fim = rows[i].cells[2].textContent;
+
+                ferias.push({
+                    nome: nome,
+                    inicio: inicio,
+                    fim: fim
+                });
+            }
+
+            localStorage.setItem("ferias", JSON.stringify(ferias));
+        }
+
+        function carregarDados() {
+            var ferias = localStorage.getItem("ferias");
+            if (ferias) {
+                ferias = JSON.parse(ferias);
+
+                var table = document.getElementById("tabela-ferias");
+
+                for (var i = 0; i < ferias.length; i++) {
+                    var row = table.insertRow(-1);
+                    var cell1 = row.insertCell(0);
+                    var cell2 = row.insertCell(1);
+                    var cell3 = row.insertCell(2);
+                    var cell4 = row.insertCell(3);
+
+                    cell1.textContent = ferias[i].nome;
+                    cell2.textContent = ferias[i].inicio;
+                    cell3.textContent = ferias[i].fim;
+
+                    var editarButton = document.createElement("button");
+                    editarButton.textContent = "Editar";
+                    editarButton.addEventListener("click", function () {
+                        editarFerias(this);
+                    });
+                    cell4.appendChild(editarButton);
+
+                    var excluirButton = document.createElement("button");
+                    excluirButton.textContent = "Excluir";
+                    excluirButton.className = "excluir";
+                    excluirButton.addEventListener("click", function () {
+                        excluirFerias(this);
+                    });
+                    cell4.appendChild(excluirButton);
+                }
+            }
+        }
+
+        function formatDate(dateStr) {
+            var date = new Date(dateStr);
+            var day = date.getDate() +1;
+            var month = date.getMonth() + 1;
+            var year = date.getFullYear();
+
+            if (day < 10) {
+                day = '0' + day;
+            }
+            if (month < 10) {
+                month = '0' + month;
+            }
+
+            return day + '/' + month + '/' + year;
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Agendamento de Férias</h1>
+    <form method="post" onsubmit="event.preventDefault(); agendarFerias();">
+        <label for="nome">Nome do Funcionário:</label>
+        <input type="text" id="nome" name="nome" required>
+
+        <label for="inicio">Data de Início:</label>
+        <input type="date" id="inicio" name="inicio" required>
+
+        <label for="fim">Data de Término:</label>
+        <input type="date" id="fim" name="fim" required>
+
+        <input id="agendar" type="submit" value="Agendar Férias">
+    </form>
+
+    <table id="tabela-ferias">
+        <caption>Férias Agendadas</caption>
+        <tr>
+            <th>Nome do Funcionário</th>
+            <th>Data de Início</th>
+            <th>Data de Término</th>
+            <th>Ação</th>
+        </tr>
+    </table>
+</body>
+
+</html>
